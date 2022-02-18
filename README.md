@@ -5,4 +5,4 @@
 
 #### Steps: 
 
-1. Download evictions data from here(https://evictionlab.org/eviction-tracking/get-the-data/).
+1. Download evictions data from [here](https://evictionlab.org/eviction-tracking/get-the-data/).
