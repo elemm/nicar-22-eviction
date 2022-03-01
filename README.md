@@ -4,32 +4,33 @@
 ## Here are the resources for the Eviction Lab's presentation at the 2022 IRE-NICAR conference 
 
 #### Steps: 
-1. Download evictions data from [here](https://evictionlab.org/eviction-tracking/get-the-data/). Data dictionary for these data are available [here](https://eviction-lab-data-downloads.s3.amazonaws.com/ets/data_dictionary_weekly_monthly.xlsx).
-2. Download "eviction hotspots" [here](https://eviction-lab-data-downloads.s3.amazonaws.com/ets/hotspots_reports.zip).
-3. Open up workshop.R
+1. Clone [this Github repo](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository)
+2. Download evictions data from [here](https://evictionlab.org/eviction-tracking/get-the-data/). Data dictionary for these data are available [here](https://eviction-lab-data-downloads.s3.amazonaws.com/ets/data_dictionary_weekly_monthly.xlsx). Download them into the same directory you clone the Git repo to. 
+3. Download "eviction hotspots" [here](https://eviction-lab-data-downloads.s3.amazonaws.com/ets/hotspots_reports.zip).
+4. Open up workshop.R
 
 #### More information:          
 * More research about the role of "top eviction hotspots" [here](https://evictionlab.org/top-evicting-landlords-drive-us-eviction-crisis/)
 * Data are avaiable for select cities and updated quarterly - next update in March.
-  * albuquerque
-  * bridgeport   
-  * cincinnati   
-  * cleveland    
-  * columbus     
-  * dallas   
-  * gainesville  
-  * greenville  
-  * houston      
-  * indianapolis 
-  * jacksonville 
-  * kansascity   
-  * memphis      
-  * minneapolis  
-  * philadelphia 
-  * phoenix      
-  * southbend    
-  * stlouis      
-  * tampa 
+  * Albuquerque
+  * Bridgeport   
+  * Cincinnati   
+  * Cleveland    
+  * Columbus     
+  * Dallas   
+  * Gainesville  
+  * Greenville  
+  * Houston      
+  * Indianapolis 
+  * Jacksonville 
+  * Kansas City   
+  * Memphis      
+  * Minneapolis  
+  * Philadelphia 
+  * Phoenix      
+  * Southbend    
+  * St.louis      
+  * Tampa 
 
 * Data dictionary:     
   *  position = ranking among "top evictors"
