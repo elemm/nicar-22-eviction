@@ -6,6 +6,16 @@ library(tidycensus)
 library(sf)
 # remotes::install_github("walkerke/crsuggest")
 library(crsuggest)
+# you'll need an API key from one of these services to use this package: Census, Nominatim, Geocodio, or Location IQ 
+library(tidygeocoder)
+Sys.setenv(GEOCODIO_API_KEY = "28436457534b3b68f46622348435444384f44bf")
+geocode(address = )
+
+# need a Census API key for some of this mapping
+# you can get one online at: https://api.census.gov/data/key_signup.html
+# to install the key to be saved as a local environment variable, run the following code
+# census_api_key("111111abc", install = TRUE)
+
 
 # color presets 
 elab_orange <- "#E24000"
@@ -103,9 +113,6 @@ allsites %>%
   mutate(GEOID = as.character(GEOID)) %>%
   left_join(shp_df, by = "GEOID") -> vis_sf
 
-n_distinct(vis_sf$GEOID)
-n_distinct(vis_sf$week_date)
-
 vis_sf %>% 
   ggplot(aes(fill = pct_historical, geometry = geometry)) + 
   geom_sf(color = NA) + 
@@ -164,9 +171,47 @@ top_evictors_df <- read.csv(hotspots_paths[1])
 # top100 = proportion of eviction filings made up by the top 100 highest evicting addresses
 # new data will be avaiable in March
 ########
+# add city and state depending on which file you're looking at 
+top_evictors_df %>% 
+  mutate(full_addr = paste0(xstreet_clean, " Albuquerque",",NM")) %>% 
+  geocode(full_addr) -> geocoded_df
+  
+# plot points on a shapefile map 
+# add sf 
+my_sf <- st_as_sf(geocoded_df %>% filter(!is.na(lat) & !is.na(long)), coords = c('long', 'lat'))  
+
+shp_df_top_evictors <- get_acs(state = "NM", county = c("Bernalillo"), geography = "tract", 
+                               variables = "B19013_001", geometry = TRUE)
+suggest_top_crs(shp_df_top_evictors)
+
+shp_df %>% st_transform(crs = 32113) -> shp_st
+
+ggplot() + 
+  geom_sf(my_sf, mapping = aes(size = filings), alpha = .2, color = elab_orange)
+
+ggplot(data = shp_df_top_evictors) +
+  geom_sf() +
+  geom_point(data = geocoded_df, aes(x = long, y = lat, color = filings)) + 
+  scale_color_viridis_c(limits=c(0,100))
+
+## using leaflet to just plot locations ---- 
+library(leaflet)
+library(sp)
+leaflet_df <- geocoded_df %>% filter(!is.na(lat) & !is.na(long))
+
+coordinates(leaflet_df) <- ~long+lat
+
+leaflet(leaflet_df) %>%   
+  addCircleMarkers(
+  label = ~ filings,
+  fillColor = "goldenrod",
+  fillOpacity = 1,
+  radius = 5,
+  stroke = F
+  ) %>%
+  addProviderTiles("CartoDB.Positron")
 
 
-top_evictors_df 
 
 
 
