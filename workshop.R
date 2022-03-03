@@ -117,7 +117,23 @@ ggsave(atx_filings, filename = "nicar-22-eviction/atx_filings.png")
 
 
 ## combining city + state data without overlap 
-##TODO: add code from Jacob 
+
+c <- allcities %>%
+  filter(!city %in% c("Albuquerque, NM","Bridgeport, CT", "Hartford, CT", "Indianapolis, IN", "Kansas City, MO","Minneapolis-Saint Paul, MN", "South Bend, IN", "St Louis, MO","Wilmington, DE")) %>%
+  select(city, week,week_date, filings_2020, filings_avg) %>%
+  rename(site = city)
+
+s <- allstates %>%   
+  select(state, week, week_date, filings_2020, filings_avg) %>%
+  rename(site = state)
+
+a <- bind_rows(s,c)
+
+a %>% 
+  group_by(week,week_date) %>%
+  summarise(filings_2020 = sum(filings_2020),
+            filings_avg = sum(filings_avg),
+            share = filings_2020/filings_avg)
 
 # looking into racial patterns of filing change in Charleston 
 allcities %>% 
