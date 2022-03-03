@@ -1,5 +1,8 @@
+#### Eviction Lab at Princeton University
+#### IRE-NICAR 2022 Presentation
+#### Written by: Emily Lemmerman 
 
-# Libraries
+# Libraries---- 
 library(tidyverse)
 library(data.table)
 library(tidycensus)
@@ -8,8 +11,7 @@ library(sf)
 library(crsuggest)
 # you'll need an API key from one of these services to use this package: Census, Nominatim, Geocodio, or Location IQ 
 library(tidygeocoder)
-Sys.setenv(GEOCODIO_API_KEY = "28436457534b3b68f46622348435444384f44bf")
-geocode(address = )
+# Sys.setenv(GEOCODIO_API_KEY = "api_key")
 
 # need a Census API key for some of this mapping
 # you can get one online at: https://api.census.gov/data/key_signup.html
@@ -29,23 +31,40 @@ blog_background <- "#EEF2F5"
 
 # if you saved the downloaded data in the same place you cloned your github repo to, you 
 # should be able to access it here
-allsites_path <- paste0(getwd(), "/all_sites_weekly_2020_2021.csv")
+allcities_path <- paste0(getwd(), "/all_sites_weekly_2020_2021.csv")
+allstates_path <- paste0(getwd(), "/allstates_weekly_2020_2021.csv")
 
 # filepath to the all_sites_weekly 
-read_csv(allsites_path) -> allsites
+read_csv(allcities_path) -> allcities
+read_csv(allstates_path) -> allstates
 
 # take an initial look at the data
-summary(allsites)
+# some GEOIDs are missing 
+glimpse(allcities)
+glimpse(allstates)
 
-allsites %>% 
-  mutate(pct_historical = filings_2020 / filings_avg) %>% 
+allcities %>% 
+  group_by(city, week_date) %>% 
+  summarise(hist_filings_sum = sum(filings_2020),
+            pand_filings_sum = sum(filings_avg)) %>% 
+  mutate(pct_historical = (hist_filings_sum / pand_filings_sum)* 100) %>%
   ggplot(aes(x = week_date, y = pct_historical)) +
   geom_col() + 
-  facet_wrap(city ~ .)
+  geom_hline(yintercept = 100,color = elab_orange) + 
+  geom_smooth(color = elab_blue,alpha = .7,method = "loess") + 
+  facet_wrap(city ~ ., scales = "fixed") +
+  scale_y_continuous(limits = c(0,120)) + 
+  labs(x = "Date",
+       y = "Percent of Historical Filings",
+       title = "Pandemic eviction filings as % of historical filings") + 
+  theme_minimal() + 
+  theme(axis.text.x = element_text(angle = 300,
+                                  hjust = -.4)) -> facet_by_city_pct
 
+ggsave(facet_by_city_pct, filename = "nicar-22-eviction/facet_by_city_pct.png")
 
-# For all sites at once 
-allsites %>%   
+# For all cities at once 
+allcities %>%   
   group_by(week, week_date,city) %>% 
   summarize(filings_2020 = sum(filings_2020),
             filings_avg = sum(filings_avg, na.rm = T)) %>%
@@ -57,15 +76,20 @@ allsites %>%
                        avg = "pre-pandemic")) %>% 
   mutate(year = recode(year,
                        "2020" = "pandemic")) %>% 
-  ggplot(aes(x = week,
+  ggplot(aes(x = week_date,
              y = filings)) +
   geom_line(aes(color = year)) +
   theme_minimal() + 
-  facet_wrap(city ~.) + 
+  facet_wrap(city ~.,scales = "free") + 
   scale_color_manual(values = c(elab_orange,elab_blue)) +
-  labs(title = "Weekly Eviction Filings: Pandemic vs. Pre-Pandemic")
+  labs(title = "Average Weekly Eviction Filings: Pandemic vs. Pre-Pandemic") -> facet_by_city_raw
 
-allsites %>%   
+
+ggsave(facet_by_city_raw, filename = "nicar-22-eviction/facet_by_city_raw.png")
+
+
+## 1 individual city 
+allcities %>%   
   filter(str_detect(city, "Austin")) %>% 
   group_by(week_date,city) %>% 
   summarize(filings_2020 = sum(filings_2020),
@@ -81,14 +105,22 @@ allsites %>%
   ggplot(aes(x = week_date,
              y = filings)) +
   geom_line(aes(color = year)) +
-  facet_wrap(city ~.) + 
+  geom_smooth(aes(color = year),se = FALSE) + 
   theme_minimal() + 
+  theme(axis.title.x = element_blank()) + 
   scale_color_manual(values = c(elab_orange,elab_blue)) +
-  labs(title = "Weekly Eviction Filings in Austin: Pandemic vs. Pre-Pandemic")
+  labs(title = "Weekly Eviction Filings in Austin: Pandemic vs. Pre-Pandemic",
+       y = "Number of Filings",
+       color = "Time Period") -> atx_filings
 
+ggsave(atx_filings, filename = "nicar-22-eviction/atx_filings.png")
+
+
+## combining city + state data without overlap 
+##TODO: add code from Jacob 
 
 # looking into racial patterns of filing change in Charleston 
-allsites %>% 
+allcities %>% 
   filter(str_detect(city, "Charles")) %>% 
   group_by(racial_majority) %>% 
   mutate(count = n_distinct(GEOID)) %>% 
@@ -96,16 +128,24 @@ allsites %>%
   mutate(pct_historical = (filings_2020 / filings_avg)*100) %>%
   mutate(pct_historical = ifelse(is.infinite(pct_historical),(filings_2020 / (filings_avg + 1))*100,pct_historical)) %>% 
   group_by(racial_majority) %>% 
-  summarise(mean(pct_historical,na.rm = T))
+  summarise(mean(pct_historical,na.rm = T)) 
 
+
+# # A tibble: 4 × 2
+# racial_majority `mean(pct_historical, na.rm = T)`
+# <chr>                                       <dbl>
+#   1 Black                                        68.2
+# 2 Other                                        79.5
+# 3 White                                        67.5
+# 4 NA                                          116. 
 
 # mapping the percent change by tract in Charleston
 shp_df <- get_acs(state = "SC", county = c("Berkeley","Charleston","Dorchester"), geography = "tract", 
                   variables = "B19013_001", geometry = TRUE)
 
-# Note - this won't work for places without GEOID data - i.e. Austin, Richmond, Philadelphia
+# Note - this won't work for places without GEOID data - i.e. Austin, Richmond
 # for these places, map using zip codes
-allsites %>% 
+allcities %>% 
   filter(str_detect(city, "Charles")) %>% 
   group_by(week_date,GEOID) %>%
   mutate(pct_historical = (filings_2020 / filings_avg)*100) %>%
@@ -126,7 +166,7 @@ shp_df <- get_acs(state = "TX", county = c("Dallas"), geography = "tract",
 
 # Note - this won't work for places without GEOID data - i.e. Austin, Richmond, Philadelphia
 # for these places, map using zip codes
-allsites %>% 
+allcities %>% 
   filter(str_detect(city, "Dallas")) %>% 
   group_by(week_date,week,GEOID) %>%
   summarize(filings_2020 = sum(filings_2020),
@@ -210,10 +250,3 @@ leaflet(leaflet_df) %>%
   stroke = F
   ) %>%
   addProviderTiles("CartoDB.Positron")
-
-
-
-
-
-
-   
