@@ -5,7 +5,7 @@
 
 #### Steps: 
 1. Clone [this Github repo](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository)
-2. Download evictions data from [here](https://evictionlab.org/eviction-tracking/get-the-data/). Data dictionary for these data are available [here](https://eviction-lab-data-downloads.s3.amazonaws.com/ets/data_dictionary_weekly_monthly.xlsx). Download them into the same directory you clone the Git repo to. 
+2. Download evictions data at the city and state level [here](https://evictionlab.org/eviction-tracking/get-the-data/). Data dictionary for these data are available [here](https://eviction-lab-data-downloads.s3.amazonaws.com/ets/data_dictionary_weekly_monthly.xlsx). Download them into the same directory you clone the Git repo to. 
 3. Download "eviction hotspots" [here](https://eviction-lab-data-downloads.s3.amazonaws.com/ets/hotspots_reports.zip).
 4. Open up workshop.R
 
