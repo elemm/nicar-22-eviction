@@ -82,12 +82,12 @@ allcities %>%
   theme_minimal() + 
   facet_wrap(city ~.,scales = "free") + 
   scale_color_manual(values = c(elab_orange,elab_blue)) +
-  theme(axis.text.x = element_text(angle = 300,
+  theme(axis.text.x = element_text(angle = 280,
                                    hjust = -.4)) + 
   labs(title = "Average Weekly Eviction Filings: Pandemic vs. Pre-Pandemic") -> facet_by_city_raw
 
 
-ggsave(facet_by_city_raw, filename = "nicar-22-eviction/facet_by_city_raw.png")
+ggsave(facet_by_city_raw, filename = "nicar-22-eviction/facet_by_city_raw.png",width = 20, height = 10)
 
 
 ## 1 individual city 
