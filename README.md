@@ -1,7 +1,19 @@
 # nicar-22-eviction
-
-
 ## Here are the resources for the Eviction Lab's presentation at the 2022 IRE-NICAR conference 
+
+#### Helpful packages: 
+
+*  data acquisition
+    * [court-reporter](https://github.com/biglocalnews/court-scraper) from Big Local News 
+*  record linking packages 
+    * [fastLink](https://github.com/kosukeimai/fastLink)
+    * [BRL](https://search.r-project.org/CRAN/refmans/BRL/html/BRL.html)
+* race imputation
+    * [wru](https://github.com/kosukeimai/wru) 
+* gender imputation
+    * [genderizer](https://github.com/kalimu/genderizeR)
+    * [gender](https://github.com/lmullen/gender)
+    * [genderdata](https://github.com/lmullen/genderdata)
 
 #### Steps: 
 1. Clone [this Github repo](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository)
